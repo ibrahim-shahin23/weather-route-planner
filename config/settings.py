@@ -2,10 +2,13 @@
 import os
 from pathlib import Path
 
-from dotenv import load_dotenv
-
 BASE_DIR = Path(__file__).resolve().parent.parent
-load_dotenv(BASE_DIR / ".env")
+
+try:
+    from dotenv import load_dotenv
+    load_dotenv(BASE_DIR / ".env")
+except ImportError:
+    pass
 
 
 def env(name: str, default: str = "") -> str:
@@ -27,6 +30,9 @@ if not SECRET_KEY:
 ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1" if DEBUG else "")
 if env("RENDER_EXTERNAL_HOSTNAME"):  # set automatically on Render
     ALLOWED_HOSTS.append(env("RENDER_EXTERNAL_HOSTNAME"))
+if env("VERCEL_URL"):  # set automatically on Vercel
+    ALLOWED_HOSTS.append(env("VERCEL_URL"))
+    ALLOWED_HOSTS.append(".vercel.app")
 
 INSTALLED_APPS = [
     "corsheaders",
